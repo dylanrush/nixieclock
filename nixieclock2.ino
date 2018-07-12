@@ -65,18 +65,28 @@ void loop() {
   //get current time 
   RTC.get(rtc, true);
 
+  int hours = rtc[2];
+  // convert 24H to 12H
+  if(hours == 0) {
+    hours = 12;
+  }
+  else if(hours > 12) {
+    hours -= 12;
+  }
+
   int seconds_ones = rtc[0] % 10;
   int seconds_tens = rtc[0] / 10;
   int minutes_ones = rtc[1] % 10;
   int minutes_tens = rtc[1] / 10;
-  int hours_ones = rtc[2] % 10;
-  int hours_tens = rtc[2] / 10;
+  int hours_ones = hours % 10;
+  int hours_tens = hours / 10;
 
   digitalWrite(2, hours_tens & 0x01);
 
   nixieWrite(3, 4, 5, 6, hours_ones);
 
   nixieWrite(7, 8, 9, 10, minutes_tens);
+
   // miswire
   if (minutes_ones == 5) {
     minutes_ones = 1;
@@ -101,10 +111,7 @@ void loop() {
     int newHours = rtc[2];
     int newMinutes = rtc[1];
     if (pressedDuration > longPressThresholdMsec) {
-      newHours = (newHours + 1) % 12;
-      if (newHours == 0) {
-        newHours = 12;
-      }
+      newHours = (newHours + 1) % 24;
     } else {
       newMinutes = (newMinutes + 1) % 60;
     }
